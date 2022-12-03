@@ -1,17 +1,57 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom/client";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+// Router
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// Components
+import App from "./pages/Home";
+import Users from "./pages/users";
+import User from "./pages/users/user";
+import ErrorPage from "./pages/404";
+
+// CSS
+import "./style/index.css";
+
+const RandomUserAPI = "https://randomuser.me/api/?results=50";
+
+const IndexPage = () => {
+  const [resultFromApi, setResultFromApi] = useState([]);
+
+  useEffect(() => {
+    FetchAPIFromServer();
+  }, []);
+
+  const router = createBrowserRouter([
+    {
+      path: "*",
+      element: <ErrorPage />,
+    },
+    {
+      path: "/",
+      element: <App />,
+    },
+    {
+      path: "/users",
+      element: <Users resultFromApi={resultFromApi} />,
+    },
+    {
+      path: "/users/:id",
+      element: <User resultFromApi={resultFromApi} />,
+    },
+  ]);
+
+  const FetchAPIFromServer = async () => {
+    const response = await fetch(RandomUserAPI);
+    const result = await response.json();
+    setResultFromApi(result.results);
+  };
+
+  return <RouterProvider router={router} />;
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <IndexPage />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
